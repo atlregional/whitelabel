@@ -81,7 +81,7 @@ var google_geocoder = function( request, response ) {
     url: google_url + request.term + '&sensor=false&key=AIzaSyCSEnj3req-uXzLNeFuEgY-57M-AL1nq50',
     dataType: "json",
     success: function( data ) {
-      response( $.map( data.features, function( item ) {
+      response( $.map( data.results, function( item ) {
       return {
         label: item.formatted_address,
         value: item.formatted_address,
