@@ -77,8 +77,9 @@ var bliksem_geocoder = function( request, response ) {
 
 var google_geocoder = function( request, response ) {
   var google_url = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
+  var key = 'AIzaSyCSEnj3req-uXzLNeFuEgY-57M-AL1nq50'
   $.ajax({
-    url: google_url + request.term + '&components=administrative_area:GA|country:US&sensor=false&key=AIzaSyCWQD-lrFXiuKBUpB3vWIYzyj1LU7qQT1c',
+    url: google_url + request.term + '&components=administrative_area:GA|country:US&sensor=false&key=' + key,
     dataType: "json",
     success: function( data ) {
       response( $.map( data.results, function( item ) {
