@@ -1,4 +1,4 @@
-var planningserver = whitelabel_prefix+'/rrrr?';
+var planningserver = whitelabel_prefix+'/?';
 
 String.prototype.lpad = function(padString, length) {
     var str = this;
@@ -75,8 +75,25 @@ var bliksem_geocoder = function( request, response ) {
 };
 
 
+var google_geocoder = function( request, response ) {
+  var google_url = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
+  $.ajax({
+    url: google_url + request.term + '&sensor=false&key=AIzaSyCSEnj3req-uXzLNeFuEgY-57M-AL1nq50',
+    dataType: "json",
+    success: function( data ) {
+      response( $.map( data.features, function( item ) {
+      return {
+        label: item.formatted_address,
+        value: item.formatted_address,
+        latlng: item.geometry.location.lat+','+item.geometry.location.lng
+        }
+      }));
+    }
+  });
+};
+
 var Geocoder = Geocoder || {};
-Geocoder.geocoder = bliksem_geocoder;
+Geocoder.geocoder = google_geocoder;
 
 switchLocale();
 
