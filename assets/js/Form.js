@@ -1,4 +1,4 @@
-var planningserver = whitelabel_prefix+'/?';
+var planningserver = whitelabel_prefix+'ws/plan?';
 
 String.prototype.lpad = function(padString, length) {
     var str = this;
@@ -78,7 +78,7 @@ var bliksem_geocoder = function( request, response ) {
 var google_geocoder = function( request, response ) {
   var google_url = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
   $.ajax({
-    url: google_url + request.term + '&components=administrative_area:GA|country:US&sensor=false&key=AIzaSyCSEnj3req-uXzLNeFuEgY-57M-AL1nq50',
+    url: google_url + request.term + '&components=administrative_area:GA|country:US&sensor=false&key=AIzaSyCWQD-lrFXiuKBUpB3vWIYzyj1LU7qQT1c',
     dataType: "json",
     success: function( data ) {
       response( $.map( data.results, function( item ) {
@@ -249,21 +249,26 @@ function earlierAdvice(){
   plannerreq.date = epochtoIS08601date(minEpoch);
   plannerreq.time = epochtoIS08601time(minEpoch);
 
-  var url = planningserver + jQuery.param(makeBliksemReq(plannerreq));
-  $.get( url, function( data ) {
-    if (!('itineraries' in data.plan) || data.plan.itineraries.length == 0){
-        return;
-    }
-    var startDate = $('#planner-advice-list').find('.planner-advice-dateheader').first().html();
-    $.each( data.plan.itineraries , function( index, itin ){
-        var prettyStartDate = prettyDateEpoch(itin.startTime);
-        if (startDate != prettyStartDate){
-            $('<div class="planner-advice-dateheader">'+prettyStartDate+'</div>').insertAfter('#planner-advice-earlier');
-            startDate = prettyStartDate;
+  var url = planningserver + jQuery.param(plannerreq);
+  $.ajax({
+      url: url,
+      type: "GET",
+      dataType: "jsonp", 
+      success: function( data ) {
+        if (!('itineraries' in data.plan) || data.plan.itineraries.length == 0){
+          return;
         }
-        itinButton(itin).insertAfter($('#planner-advice-list').find('.planner-advice-dateheader').first());
-    });
-    $('#planner-advice-earlier').button('reset');
+        var startDate = $('#planner-advice-list').find('.planner-advice-dateheader').first().html();
+        $.each( data.plan.itineraries , function( index, itin ){
+            var prettyStartDate = prettyDateEpoch(itin.startTime);
+            if (startDate != prettyStartDate){
+                $('<div class="planner-advice-dateheader">'+prettyStartDate+'</div>').insertAfter('#planner-advice-earlier');
+                startDate = prettyStartDate;
+            }
+            itinButton(itin).insertAfter($('#planner-advice-list').find('.planner-advice-dateheader').first());
+        });
+        $('#planner-advice-earlier').button('reset');
+      }
   });
   return false;
 }
@@ -292,24 +297,29 @@ function laterAdvice(){
   plannerreq.arriveBy = false;
   plannerreq.date = epochtoIS08601date(maxEpoch);
   plannerreq.time = epochtoIS08601time(maxEpoch);
-  var url = planningserver + jQuery.param(makeBliksemReq(plannerreq));
+  var url = planningserver + jQuery.param(plannerreq);
   console.log(decodeURIComponent(url));
-  $.get( url, function( data ) {
-    if (!('itineraries' in data.plan) || data.plan.itineraries.length == 0){
-        return;
-    }
-    var startDate = $('#planner-advice-list').find('.planner-advice-dateheader').last().html();
-    $.each( data.plan.itineraries , function( index, itin ){
-        var prettyStartDate = prettyDateEpoch(itin.startTime);
-        if (startDate != prettyStartDate){
-            $(('<div class="planner-advice-dateheader">'+prettyStartDate+'</div>')).insertAfter($('#planner-advice-list').find('.planner-advice-itinbutton').last());
-            itinButton(itin).insertAfter($('#planner-advice-list').find('.planner-advice-dateheader').last());
-            startDate = prettyStartDate;
-        }else{
-            itinButton(itin).insertAfter($('#planner-advice-list').find('.planner-advice-itinbutton').last());
+  $.ajax({
+      url: url,
+      type: "GET",
+      dataType: "jsonp", 
+      success: function( data ) {
+        if (!('itineraries' in data.plan) || data.plan.itineraries.length == 0){
+            return;
         }
-    });
-    $('#planner-advice-later').button('reset');
+        var startDate = $('#planner-advice-list').find('.planner-advice-dateheader').last().html();
+        $.each( data.plan.itineraries , function( index, itin ){
+            var prettyStartDate = prettyDateEpoch(itin.startTime);
+            if (startDate != prettyStartDate){
+                $(('<div class="planner-advice-dateheader">'+prettyStartDate+'</div>')).insertAfter($('#planner-advice-list').find('.planner-advice-itinbutton').last());
+                itinButton(itin).insertAfter($('#planner-advice-list').find('.planner-advice-dateheader').last());
+                startDate = prettyStartDate;
+            }else{
+                itinButton(itin).insertAfter($('#planner-advice-list').find('.planner-advice-itinbutton').last());
+            }
+        });
+        $('#planner-advice-later').button('reset');
+      }
   });
   return false;
 }
@@ -332,13 +342,14 @@ var itineraries = null;
 
 function legItem(leg){
     var legItem = $('<li class="list-group-item advice-leg"><div></div></li>');
+    console.log(leg)
     if (leg.mode == 'WALK'){
         if (leg.from.name == leg.to.name){
             return;
         }
         legItem.append('<div class="list-group-item-heading"><h4 class="leg-header"><b>'+Locale.walk+'</b></h4></div>');
     } else {
-        legItem.append('<div class="list-group-item-heading"><h4 class="leg-header"><b>'+leg.route+'</b> '+leg.headsign.replace(" via ", " "+Locale.via.toLowerCase()+" ")+'<span class="leg-header-agency-name"><small>'+leg.agencyName+'</small></span></h4>');
+        legItem.append('<div class="list-group-item-heading"><h4 class="leg-header"><b>'+leg.route+'</b> '+leg.headsign.replace(" via ", " "+Locale.via.toLowerCase()+" ")+'<span class="leg-header-agency-name"><small>'+leg.agencyId+'</small></span></h4>');
     }
     var startTime = timeFromEpoch(leg.startTime-(leg.departureDelay ? leg.departureDelay : 0)*1000);
     var delayMin = (leg.departureDelay/60)|0;
@@ -408,46 +419,53 @@ function itinButton(itin){
 }
 
 function planItinerary(plannerreq){
-  var url = planningserver + jQuery.param(makeBliksemReq(plannerreq));
+  var url = planningserver + jQuery.param(plannerreq);
   $('#planner-advice-container').prepend('<div class="progress progress-striped active">'+
   '<div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="100" aria-valuemax="100" style="width: 100%">'+
   '<span class="sr-only">'+Locale.loading+'</span></div></div>');
   $('#planner-advice-list').html('');
   $('#planner-leg-list').html('');
-  $.get( url, function( data ) {
-    $('#planner-leg-list').html('');
-    itineraries = []
-    $('#planner-advice-list').html('');
-    $('.progress.progress-striped.active').remove();
-    if (!('itineraries' in data.plan) || data.plan.itineraries.length == 0){
-        $('#planner-advice-container').prepend('<div class="row alert alert-danger" role="alert">'+Locale.noAdviceFound+'</div>');
-        return;
-    }
-    $('#planner-advice-container').find('.alert').remove();
-    var startDate = null;
-    $('#planner-advice-list').append('<button type="button" class="btn btn-primary" id="planner-advice-earlier" data-loading-text="'+Locale.loading+'" onclick="earlierAdvice()">'+Locale.earlier+'</button>');
-    $.each( data.plan.itineraries , function( index, itin ){
-        var prettyStartDate = prettyDateEpoch(itin.startTime);
-        if (startDate != prettyStartDate){
-            $('#planner-advice-list').append('<div class="planner-advice-dateheader">'+prettyStartDate+'</div>');
-            startDate = prettyStartDate;
+
+  $.ajax({
+      url: url,
+      type: "GET",
+      dataType: "jsonp", 
+      success: function( data ) {
+        $('#planner-leg-list').html('');
+        itineraries = []
+        $('#planner-advice-list').html('');
+        $('.progress.progress-striped.active').remove();
+        if (!('itineraries' in data.plan) || data.plan.itineraries.length == 0){
+            $('#planner-advice-container').prepend('<div class="row alert alert-danger" role="alert">'+Locale.noAdviceFound+'</div>');
+            return;
         }
-        $('#planner-advice-list').append(itinButton(itin));
-    });
-    $('#planner-advice-list').append('<button type="button" class="btn btn-primary" id="planner-advice-later" data-loading-text="'+Locale.loading+'" onclick="laterAdvice()">'+Locale.later+'</button>');
-    $('#planner-advice-list').find('.planner-advice-itinbutton').first().click();
-    $('#planner-options-submit').button('reset');
-    earlierAdvice();
-    laterAdvice();
+        $('#planner-advice-container').find('.alert').remove();
+        var startDate = null;
+        $('#planner-advice-list').append('<button type="button" class="btn btn-primary" id="planner-advice-earlier" data-loading-text="'+Locale.loading+'" onclick="earlierAdvice()">'+Locale.earlier+'</button>');
+        $.each( data.plan.itineraries , function( index, itin ){
+            var prettyStartDate = prettyDateEpoch(itin.startTime);
+            if (startDate != prettyStartDate){
+                $('#planner-advice-list').append('<div class="planner-advice-dateheader">'+prettyStartDate+'</div>');
+                startDate = prettyStartDate;
+            }
+            $('#planner-advice-list').append(itinButton(itin));
+        });
+        $('#planner-advice-list').append('<button type="button" class="btn btn-primary" id="planner-advice-later" data-loading-text="'+Locale.loading+'" onclick="laterAdvice()">'+Locale.later+'</button>');
+        $('#planner-advice-list').find('.planner-advice-itinbutton').first().click();
+        $('#planner-options-submit').button('reset');
+        earlierAdvice();
+        laterAdvice();
+      }
   });
+
 }
 
 function makePlanRequest(){
   plannerreq = {}
-  plannerreq.fromPlace = $('#planner-options-from').val();
-  plannerreq.fromLatLng = $('#planner-options-from-latlng').val();
-  plannerreq.toPlace = $('#planner-options-dest').val();
-  plannerreq.toLatLng = $('#planner-options-dest-latlng').val();
+  plannerreq.fromPlace = $('#planner-options-from-latlng').val();
+  // plannerreq.fromLatLng = $('#planner-options-from-latlng').val();
+  plannerreq.toPlace = $('#planner-options-dest-latlng').val();
+  // plannerreq.toLatLng = $('#planner-options-dest-latlng').val();
   plannerreq.time = getTime();
   plannerreq.date = getDate();
   plannerreq.arriveBy = false;
