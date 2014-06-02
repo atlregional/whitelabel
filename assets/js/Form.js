@@ -340,6 +340,18 @@ function timeFromEpoch(epoch){
 
 var itineraries = null;
 
+function toTitleCase(str) {
+    return str.replace(/\w\S*/g, function(txt){
+      if (/LCI|CTP|TDM|CSX|MARTA|^FY$|^ARC$|^SR$|^II$|^STP$|^III$|^US$|CMAQ/g.test(txt))
+        return txt
+      else if (/^IN$|^OF$|^AND$|^FOR$/g.test(txt)){
+        return txt.toLowerCase()
+      }
+      else
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+}
+
 function legItem(leg){
     var legItem = $('<li class="list-group-item advice-leg"><div></div></li>');
     console.log(leg)
@@ -352,7 +364,11 @@ function legItem(leg){
       var headsign = leg.routeLongName;
       if (leg.headsign !== null)
         headsign = leg.headsign;
-      legItem.append('<div class="list-group-item-heading"><h4 class="leg-header"><b>'+leg.route+'</b> '+headsign+'<span class="leg-header-agency-name"><small>'+leg.agencyId+'</small></span></h4>');
+      var headsignParts = headsign.split(" ")
+      if (headsignParts[0] === leg.route || headsignParts[0] === "MARTA"){
+        headsign = headsign.slice(headsignParts[0].length, headsign.length)
+      }
+      legItem.append('<div class="list-group-item-heading"><h4 class="leg-header"><b>'+leg.route+'</b> '+toTitleCase(headsign)+'<span class="leg-header-agency-name"><small>'+leg.agencyId+'</small></span></h4>');
     }
     var startTime = timeFromEpoch(leg.startTime-(leg.departureDelay ? leg.departureDelay : 0)*1000);
     var delayMin = (leg.departureDelay/60)|0;
@@ -381,18 +397,18 @@ function legItem(leg){
     }
 
     if (leg.from.platformCode && leg.mode == 'RAIL'){
-        legItem.append('<div><b>'+startTime+'</b> '+leg.from.name+' <small class="grey">'+Locale.platformrail+'</small> '+leg.from.platformCode+'</div>');
+        legItem.append('<div><b>'+startTime+'</b> '+toTitleCase(leg.from.name)+' <small class="grey">'+Locale.platformrail+'</small> '+leg.from.platformCode+'</div>');
     }else if (leg.from.platformCode && leg.mode != 'WALK'){
-        legItem.append('<div><b>'+startTime+'</b> '+leg.from.name+' <small class="grey">'+Locale.platform+'</small> '+leg.from.platformCode+'</div>');
+        legItem.append('<div><b>'+startTime+'</b> '+toTitleCase(leg.from.name)+' <small class="grey">'+Locale.platform+'</small> '+leg.from.platformCode+'</div>');
     }else{
-        legItem.append('<div><b>'+startTime+'</b> '+leg.from.name+'</div>');
+        legItem.append('<div><b>'+startTime+'</b> '+toTitleCase(leg.from.name)+'</div>');
     }
     if (leg.to.platformCode && leg.mode == 'RAIL'){
-        legItem.append('<div><b>'+endTime+'</b> '+leg.to.name+' <small class="grey">'+Locale.platformrail+'</small> '+leg.to.platformCode+'</div>');
+        legItem.append('<div><b>'+endTime+'</b> '+toTitleCase(leg.to.name)+' <small class="grey">'+Locale.platformrail+'</small> '+leg.to.platformCode+'</div>');
     }else if (leg.to.platformCode && leg.mode != 'WALK'){
-        legItem.append('<div><b>'+endTime+'</b> '+leg.to.name+' <small class="grey">'+Locale.platform+'</small> '+leg.to.platformCode+'</div>');
+        legItem.append('<div><b>'+endTime+'</b> '+toTitleCase(leg.to.name)+' <small class="grey">'+Locale.platform+'</small> '+leg.to.platformCode+'</div>');
     }else{
-        legItem.append('<div><b>'+endTime+'</b> '+leg.to.name+'</div>');
+        legItem.append('<div><b>'+endTime+'</b> '+toTitleCase(leg.to.name)+'</div>');
     }
     return legItem;
 }
