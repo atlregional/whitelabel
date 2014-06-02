@@ -463,9 +463,9 @@ function planItinerary(plannerreq){
 function makePlanRequest(){
   plannerreq = {}
   plannerreq.fromPlace = $('#planner-options-from-latlng').val();
-  // plannerreq.fromLatLng = $('#planner-options-from-latlng').val();
+  plannerreq.fromName = $('#planner-options-from').val();
   plannerreq.toPlace = $('#planner-options-dest-latlng').val();
-  // plannerreq.toLatLng = $('#planner-options-dest-latlng').val();
+  plannerreq.toName = $('#planner-options-dest').val();
   plannerreq.time = getTime();
   plannerreq.date = getDate();
   plannerreq.arriveBy = false;
@@ -478,8 +478,8 @@ function submit(){
   $('#planner-options-desc').html('');
   var plannerreq = makePlanRequest();
   var summary = $('<h4></h4>');
-  summary.append('<b>'+Locale.from+'</b> '+plannerreq.fromPlace+'</br>');
-  summary.append('<b>'+Locale.to+'</b> '+plannerreq.toPlace);
+  summary.append('<b>'+Locale.from+'</b> '+plannerreq.fromName+'</br>');
+  summary.append('<b>'+Locale.to+'</b> '+plannerreq.toName);
   $('#planner-options-desc').append(summary);
   $('#planner-options-desc').append('<h5>'+getPrettyDate() +', '+getTime()+'</h5>');
   if (parent && Modernizr.history){
@@ -497,17 +497,17 @@ function restoreFromHash(){
     if ('date' in plannerreq){
       setDate(plannerreq['date']);
     }
-    if ('fromPlace' in plannerreq){
-        $('#planner-options-from').val(plannerreq['fromPlace']);
+    if ('fromName' in plannerreq){
+        $('#planner-options-from').val(plannerreq['fromName']);
     }
-    if ('fromLatLng' in plannerreq){
-        $('#planner-options-from-latlng').val(plannerreq['fromLatLng']);
+    if ('fromPlace' in plannerreq){
+        $('#planner-options-from-latlng').val(plannerreq['fromPlace']);
+    }
+    if ('toName' in plannerreq){
+        $('#planner-options-dest').val(plannerreq['toName']);
     }
     if ('toPlace' in plannerreq){
-        $('#planner-options-dest').val(plannerreq['toPlace']);
-    }
-    if ('toLatLng' in plannerreq){
-        $('#planner-options-dest-latlng').val(plannerreq['toLatLng']);
+        $('#planner-options-dest-latlng').val(plannerreq['toPlace']);
     }
     if ('arriveBy' in plannerreq && plannerreq['arriveBy'] == "true"){
         $('#planner-options-arrivebefore').click();
