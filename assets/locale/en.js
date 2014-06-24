@@ -1,6 +1,6 @@
 var Locale = {}
 
-Locale.dateFormat = 'dd-mm-yy';
+Locale.dateFormat = 'mm-dd-yy';
 Locale.timeFormat = 'hh:mm';
 Locale.dateAriaLabel = 'Date, use Ctrl en arrow keys to navigate, enter to choose';
 Locale.loading = "Loading...";
