@@ -201,7 +201,8 @@ function showForm(){
 function getPrettyDate(){
    var date = getDate().split('-');
    date = new Date(date[0],date[1]-1,date[2]);
-   return Locale.days[date.getDay()] + ' ' + date.getDate() + ' ' + Locale.months[date.getMonth()];
+   console.log(Locale.days[date.getDay()])
+   return Locale.days[date.getDay()] + ' ' + Locale.months[date.getMonth()] + ' ' + date.getDate();
 }
 
 function makeBliksemReq(plannerreq){
@@ -602,7 +603,7 @@ function setupDatetime(){
 function setDate(iso8601){
     parts = iso8601.split('-');
     var d = new Date(parts[0],parseInt(parts[1])-1,parts[2]);
-    $('#planner-options-date').val(String(d.getDate()).lpad('0',2)+'-'+String((d.getMonth()+1)).lpad('0',2)+'-'+String(d.getFullYear()));
+    $('#planner-options-date').val(String((d.getMonth()+1)).lpad('0',2) + '-' + String(d.getDate()).lpad('0',2) + '-' + String(d.getFullYear()));
 }
 
 function getDate(){
@@ -620,13 +621,13 @@ function getDate(){
         return null;
       }
     }
-    if (parseInt(elements[1]) >= 1 && parseInt(elements[1]) <= 12){
-      month = elements[1];
+    if (parseInt(elements[0]) >= 1 && parseInt(elements[0]) <= 12){
+      month = elements[0];
     }else{
       return null;
     }
     if (parseInt(elements[1]) >= 1 && parseInt(elements[1]) <= 31){
-      day = elements[0];
+      day = elements[1];
     }else{
       return null;
     }
@@ -636,7 +637,8 @@ function getDate(){
 
 function getTime(){
     if(Modernizr.inputtypes.time){
-        return $('#planner-options-time').val();
+        var time = moment($('#planner-options-time').val(), "hh:mm");
+        return time.format(Locale.timeFormat)
     } else {
         var val = $('#planner-options-time').val().split(':');
         if (val.length == 1 && val[0].length <= 2 && !isNaN(parseInt(val[0]))){
