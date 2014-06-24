@@ -676,14 +676,15 @@ function setupAutoComplete(){
             $( "#planner-options-from" ).val( ui.item.label );
             $( "#planner-options-from-latlng" ).val( ui.item.latlng );
             return false;
-        },
-        response: function( event, ui ) {
-           if ( ui.content.length === 1 &&
-                ui.content[0].label.toLowerCase().indexOf( $( "#planner-options-from" ).val().toLowerCase() ) === 0 ) {
-              $( "#planner-options-from" ).val( ui.content[0].label );
-              $( "#planner-options-from-latlng" ).val( ui.content[0].latlng );
-           }
         }
+        // ,
+        // response: function( event, ui ) {
+        //    if ( ui.content.length === 1 &&
+        //         ui.content[0].label.toLowerCase().indexOf( $( "#planner-options-from" ).val().toLowerCase() ) === 0 ) {
+        //       $( "#planner-options-from" ).val( ui.content[0].label );
+        //       $( "#planner-options-from-latlng" ).val( ui.content[0].latlng );
+        //    }
+        // }
     });
     $( "#planner-options-via" ).autocomplete({
         autoFocus: true,
@@ -703,14 +704,15 @@ function setupAutoComplete(){
             $( "#planner-options-via" ).val( ui.item.label );
             $( "#planner-options-via-latlng" ).val( ui.item.latlng );
             return false;
-        },
-        response: function( event, ui ) {
-           if ( ui.content.length === 1 &&
-                ui.content[0].label.toLowerCase().indexOf( $( "#planner-options-via" ).val().toLowerCase() ) === 0 ) {
-              $( "#planner-options-via" ).val( ui.content[0].label );
-              $( "#planner-options-via-latlng" ).val( ui.content[0].latlng );
-           }
         }
+        // ,
+        // response: function( event, ui ) {
+        //    if ( ui.content.length === 1 &&
+        //         ui.content[0].label.toLowerCase().indexOf( $( "#planner-options-via" ).val().toLowerCase() ) === 0 ) {
+        //       $( "#planner-options-via" ).val( ui.content[0].label );
+        //       $( "#planner-options-via-latlng" ).val( ui.content[0].latlng );
+        //    }
+        // }
     });
     $( "#planner-options-dest" ).autocomplete({
         autoFocus: true,
@@ -730,14 +732,15 @@ function setupAutoComplete(){
             $( "#planner-options-dest" ).val( ui.item.label );
             $( "#planner-options-dest-latlng" ).val( ui.item.latlng );
             return false;
-        },
-        response: function( event, ui ) {
-           if ( ui.content.length === 1 &&
-                ui.content[0].label.toLowerCase().indexOf( $( "#planner-options-dest" ).val().toLowerCase() ) === 0 ) {
-              $( "#planner-options-dest" ).val( ui.content[0].label );
-              $( "#planner-options-dest-latlng" ).val( ui.content[0].latlng );
-           }
         }
+        // ,
+        // response: function( event, ui ) {
+        //    if ( ui.content.length === 1 &&
+        //         ui.content[0].label.toLowerCase().indexOf( $( "#planner-options-dest" ).val().toLowerCase() ) === 0 ) {
+        //       $( "#planner-options-dest" ).val( ui.content[0].label );
+        //       $( "#planner-options-dest-latlng" ).val( ui.content[0].latlng );
+        //    }
+        // }
     });
 }
 
